@@ -1,0 +1,26 @@
+version = new ProjectVersion("$project.version",System.env.SOURCE_BUILD_NUMBER)
+
+/*
+ * Copyright 2018 WanYun Corporation. All Rights Reserved.
+ */
+
+class ProjectVersion {
+	String baseVersion
+	String build
+	
+	ProjectVersion(String baseVersion, String build) {
+		this.baseVersion=baseVersion
+		this.build=build
+	}
+	
+	@Override
+	String toString() {
+		String fullVersion=baseVersion
+		
+		if (build) {
+			fullVersion+=".$build"
+		}
+		
+		fullVersion
+	}
+}

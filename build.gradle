@@ -1,0 +1,66 @@
+/*
+ *
+ *  * Copyright 2019-2020 CloudRoad Corporation. All Rights Reserved.
+ *
+ */
+
+buildscript {
+    repositories {
+        //maven {url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+        mavenCentral()
+    }
+}
+
+allprojects {
+
+    apply from: "$rootDir/gradle/versioning.gradle"
+    apply from: "$rootDir/gradle/dynamicVersionResolution.gradle"
+
+    plugins.withType(DistributionPlugin) {
+        [distTar].each { task ->
+            configurations.archives.artifacts.removeAll { it.class.simpleName == "ArchivePublishArtifact" && it.archiveTask == task }
+            task.enabled = false
+        }
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'maven'
+
+    repositories {
+        //maven {url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+        mavenCentral()
+    }
+}
+
+apply plugin: 'distribution'
+
+configurations {
+    zip
+}
+
+dependencies {
+    zip project(path: ':DDNS', configuration: 'archives')
+}
+
+distributions {
+    main {
+        contents {
+            into("bin") {
+                from configurations.zip
+            }
+        }
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.5'
+    def jvmOpts = "-Xms768m -Xmx768m"
+    inputs.property("jvmOpts", jvmOpts)
+    doLast {
+        def optsEnvVar = "DEFAULT_JVM_OPTS"
+        scriptFile.write scriptFile.text.replace("$optsEnvVar=\"\"", "$optsEnvVar=\"$jvmOpts\"")
+        batchScript.write batchScript.text.replace("set $optsEnvVar=", "set $optsEnvVar=$jvmOpts")
+    }
+}

@@ -1,0 +1,8 @@
+/*
+ *
+ *  * Copyright 2019-2020 CloudRoad Corporation. All Rights Reserved.
+ *
+ */
+
+rootProject.name = 'ddns-solution'
+include 'DDNS'

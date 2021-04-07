@@ -1,0 +1,23 @@
+/*
+ * Copyright 2018 WanYun Corporation. All Rights Reserved.
+ */
+
+afterEvaluate { project ->
+	tasks.withType(org.gradle.api.tasks.bundling.AbstractArchiveTask).findAll { it.name.startsWith("dist") }*.with {
+		def origArchiveName=null
+		doFirst {
+			origArchiveName = archiveName
+			archiveName = project.archivesBaseName
+		}
+		doLast {
+			def destDir = destinationDir
+			copy {
+				into destDir
+				from archivePath
+				rename archiveName, origArchiveName
+			}
+			delete archivePath
+			archiveName = origArchiveName
+		}
+	}
+}
